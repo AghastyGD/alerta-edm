@@ -62,7 +62,7 @@ Ensure you have Python 3xx in your machine.
     ```bash
     cp .env.sample .env
     ```
-    and then fill theses variables with your values:
+    and then fill these variables with your values:
     ```bash
    # .env
     DJANGO_ENVIRONMENT= # choose between 'dev' or 'prod'
@@ -90,7 +90,7 @@ python manage.py runserver
 
 _If you face any error about `pkg_resources` module not found when executing the project, please install or upgrade setuptools:_
 ```bash
-    pip install setuptools
+pip install setuptools
 ```
 Once the server is running, you can access the application at `http://localhost:8000/` in your web browser.
 

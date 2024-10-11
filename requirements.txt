@@ -1,0 +1,10 @@
+dj-database-url==2.2.0
+Django==5.1.2
+django-autoslug==1.9.9
+djangorestframework==3.15.2
+drf-yasg==1.21.7
+psycopg2-binary==2.9.9
+python-dotenv==1.0.1
+selenium==4.25.0
+webdriver-manager==4.0.2
+whitenoise==6.7.0

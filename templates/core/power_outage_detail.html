@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Detalhes do Corte de Energia - {{ outage.state }}{% endblock %}
+</head>
+    {% block content %}
+    <div class="container">
+        <h1>Detalhes do Corte de Energia</h1>
+        
+        <div class="date-display">
+            {{ outage.date|date:"l, d \d\e F \d\e Y" }}
+        </div>
+
+        <div class="detail-card">
+            <h2 class="detail-title">{{ outage.state }}</h2>
+            <p class="detail-text"><strong>Área:</strong> {{ outage.area }}</p>
+            <p class="detail-text"><strong>Horário:</strong> {{ outage.start_time }} - {{ outage.end_time }}</p>
+        </div>
+
+        <div class="detail-card">
+            <h3 class="detail-title">Zona Afetada</h3>
+            <p class="detail-text">{{ outage.affected_zone }}</p>
+        </div>
+
+        {% if outage.schedules.all %}
+            <div class="detail-card">
+                <h3 class="detail-title">Cronograma por Distrito</h3>
+                <ul class="list-group">
+                    {% for schedule in outage.schedules.all %}
+                        <li class="list-group-item">
+                            <strong>{{ schedule.district }}</strong>: 
+                            {{ schedule.start_time }} - {{ schedule.end_time }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <div class="text-center mt-4">
+            <a href="{% url 'power_outage_list' %}" class="btn btn-primary">Voltar para a lista</a>
+        </div>
+    </div>
+    {% endblock %}

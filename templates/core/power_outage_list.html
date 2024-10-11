@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} Cortes de Energia Programados {% endblock %}
+    {% block content %}
+    <header class="header">
+        <div class="container">
+            <h1 class="text-center">Alerta EDM</h1>
+        </div>
+    </header>
+    <main class="main-content">
+        <div class="container">
+            <h2 class="text-center mb-4">Cortes de Energia Programados</h2>
+            
+            {% if future_outages %}
+                {% for group in future_outages %}
+                    <div class="date-display">
+                        {{ group.date|date:"l, d \d\e F \d\e Y" }}
+                    </div>
+                    <div class="row">
+                        {% for outage in group.outages %}
+                            <div class="col-md-6 mb-4">
+                                <div class="card outage-card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ outage.state }}</h5>
+                                        <p class="card-text">
+                                            <strong>Horário:</strong> {{ outage.start_time }} - {{ outage.end_time }}
+                                        </p>
+                                        <p class="card-text">
+                                            <strong>Zonas afetadas:</strong> {{ outage.affected_zone|truncatewords:20 }}
+                                        </p>
+                                        <a href="{% url 'power_outage_detail' outage.slug %}" class="btn btn-primary">Ver detalhes</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-center">Não há cortes programados no momento 🎉</p>
+            {% endif %}
+
+            {% if past_outages %}
+                <div id="pastOutages">
+                    <h3 class="past-outages-title">Cortes Anteriores</h3>
+                    <div class="text-center mb-4">
+                        <button class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#pastOutagesList" aria-expanded="false" aria-controls="pastOutagesList">
+                            Ver cortes anteriores
+                        </button>
+                    </div>
+                    <div class="collapse" id="pastOutagesList">
+                        {% for outage in past_outages %}
+                            <div class="card mb-3 outage-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ outage.date|date:"l, d \d\e F \d\e Y" }} - {{ outage.state }}</h5>
+                                    <p class="card-text">
+                                        <strong>Horário:</strong> {{ outage.start_time }} - {{ outage.end_time }}
+                                    </p>
+                                    <a href="{% url 'power_outage_detail' outage.slug %}" class="btn btn-sm btn-primary">Ver detalhes</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </main>
+
+    {% endblock %}

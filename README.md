@@ -14,8 +14,9 @@ Alerta EDM, is a simple web application to inform incoming programmed power outa
 - [Usage](#usage)
 - [Running the Scraper](#running-the-scraper)
 - [API Endpoints](#api-endpoints)
+- [Swagger API Documentation](#swagger-api-documentation)
 - [Testing](#testing)
-- [License](#license)
+- [License](#licence)
 
 ---
 
@@ -146,39 +147,55 @@ In addition to running the scraper manually using the `scrap` management command
     - end_date: The end date to filter outages (optional, format: YYYY-MM-DD).
 
 ### 2. Power Outage Detail API:
-- **Endpoint:** /api/power-outage/<id>/
+- **Endpoint:** /api/power-outage/{id}/
 - **Method:** GET
 - **Description:** Retrieve details of a specific power outage.
 
 ### 3. Power Outages by State:
-- **Endpoint:** /api/power-outages/state/<slug>/
-- **Method:** GET
+- **Endpoint:** /api/power-outages/{slug}/
+- - **Method:** GET
 - **Description:** Get scheduled outages for a specific state.
 - **Query Parameters:**
     - start_date: The start date to filter outages (optional).
     - end_date: The end date to filter outages (optional).
 
 
-- **Example Response**:
+- **Example Request:**
+    ```bash
+    curl -X GET http://localhost:8000/api/power-outages/provincia-de-sofala/?start_date=2024-07-15&end_date=2024-10-16"
+    ```
+
+- **Example Response:**
     ```json
     {
       "province": "Provincia de Sofala",
-      "total_outages": 3,
+      "total_outages": 2,
       "outages": [
         {
-          "date": "2024-10-15",
+          "date": "2024-08-20",
           "locations": [
             {
               "area": "DRC",
               "affected_zone": "Matacuane, Macurungo",
+              "start_time": "06:00",
+              "end_time": "16:00"
+            }
+          ]
+        },
+        {
+          "date": "2024-09-22",
+          "locations": [
+            {
+              "area": "Beira",
+              "affected_zone": "Ponta Gêa, Maquinino",
               "start_time": "08:00",
-              "end_time": "12:00"
+              "end_time": "15:00"
             }
           ]
         }
       ]
     }
-
+    ```
 
 ### 4. Swagger API Documentation:
 - **Endpoint:** /api/swagger/

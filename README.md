@@ -16,7 +16,7 @@ Alerta EDM, is a simple web application to inform incoming programmed power outa
 - [API Endpoints](#api-endpoints)
 - [Swagger API Documentation](#swagger-api-documentation)
 - [Testing](#testing)
-- [License](#licence)
+- [License](#license)
 
 ---
 
@@ -90,7 +90,7 @@ python manage.py runserver
 
 _If you face any error about `pkg_resources` module not found when executing the project, please install or upgrade setuptools:_
 ```bash
-    pip install setuptools
+pip install setuptools
 ```
 Once the server is running, you can access the application at `http://localhost:8000/` in your web browser.
 
@@ -153,7 +153,7 @@ In addition to running the scraper manually using the `scrap` management command
 
 ### 3. Power Outages by State:
 - **Endpoint:** /api/power-outages/{slug}/
-- - **Method:** GET
+- **Method:** GET
 - **Description:** Get scheduled outages for a specific state.
 - **Query Parameters:**
     - start_date: The start date to filter outages (optional).

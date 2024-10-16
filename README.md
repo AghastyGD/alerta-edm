@@ -219,4 +219,3 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 - Contributions are welcome! Feel free to fork the repository and submit a pull request with any improvements or bug fixes.
 
 If you have any questions or encounter issues, don't hesitate to reach out: [https://augusto-domingos.vercel.app/](https://augusto-domingos.vercel.app/)
-

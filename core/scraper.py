@@ -57,7 +57,7 @@ class PowerOutageScraper:
                 # Save to the database
                 self.save_power_outages(area, state, affected_zone, date, time_periods)
 
-            except Exception:
+            except IndexError:
                 continue
 
 

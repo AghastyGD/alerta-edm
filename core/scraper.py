@@ -7,7 +7,6 @@ from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 from selenium.webdriver.common.by import By
 
-import re
 from django.conf import settings
 from datetime import datetime
 from .models import PowerOutage
@@ -47,69 +46,70 @@ class PowerOutageScraper:
         return firefox_options
 
     def scrape(self):
-        url = "https://www.edm.co.mz/pt/website-intranet-mobile/page/cortes-programados"
+        url = "https://www.edm.co.mz/manutencao" 
         self.driver.get(url)
-
-        rows = self.driver.find_elements(By.XPATH, "//table//tr")
-        for row in rows:
-            cells = row.find_elements(By.XPATH, ".//td | .//th")
-
-            if not cells or "ÁREA" in cells[0].text:
-                continue
-
+        
+        event_items = self.driver.find_elements(By.CLASS_NAME, "event2_item")
+        for event in event_items:
             try:
-                # Extract and parse data
-                area, province, zones, date_time_text = self.extract_row_data(cells)
-                date, time_periods = self.parse_date_and_multiple_times(date_time_text)
-
+                area, state, affected_zone, date, time_periods = self.extract_event_data(event)
+                            
                 # Save to the database
-                self.save_power_outages(area, province, zones, date, time_periods)
+                self.save_power_outages(area, state, affected_zone, date, time_periods)
 
-            except IndexError:
+            except Exception:
                 continue
 
-        self.driver.quit()
 
-    def extract_row_data(self, cells):
-        area = cells[0].text.strip() if len(cells) > 0 else 'N/A'
-        province = cells[1].text.strip() if len(cells) > 1 else 'N/A'
-        zones = cells[2].text.strip() if len(cells) > 2 else 'N/A'
-        date_time_text = ' '.join([p.text.strip() for p in cells[3].find_elements(By.TAG_NAME, 'p')]) if len(cells) > 3 else 'N/A'
-        return area, province, zones, date_time_text
+    def extract_event_data(self, event):
+        date_wrapper = event.find_element(By.CLASS_NAME, "event2_date-wrapper")
+        day = date_wrapper.find_elements(By.TAG_NAME, "div")[1].text.strip()
+        month_year = date_wrapper.find_elements(By.TAG_NAME, "div")[2].text.strip()
+        start_time = date_wrapper.find_elements(By.TAG_NAME, "div")[3].text.strip()
+        end_time = date_wrapper.find_elements(By.TAG_NAME, "div")[4].text.strip()
 
-    def parse_date_and_multiple_times(self, date_and_time_text):
-        date_match = re.search(r'\d{2}/\d{2}/\d{4}', date_and_time_text)
-        time_matches = re.findall(r'(\d{2}:\d{2}) às (\d{2}:\d{2})', date_and_time_text)
+        # Parse date and multiple time periods
+        date, time_periods = self.parse_date_time(day, month_year, start_time, end_time)
 
-        if date_match and time_matches:
-            date_str = date_match.group(0)
-            date = datetime.strptime(date_str, "%d/%m/%Y").date()
+        # Extract area, state and affected zone
+        area = event.find_element(By.CLASS_NAME, "event2_tag-item").text.strip()  
+        state = event.find_elements(By.CLASS_NAME, "heading-style-h5")[1].text.strip()
+        affected_zone = event.find_element(By.CLASS_NAME, "text-size-regular").text.strip()
+        
+        if "Cidade de" in state:
+            state = state 
+        else:
+            if not state.startswith("Província de"):
+                state = f"Província de {state}"
 
-            time_periods = [
-                (datetime.strptime(start_time, "%H:%M").time(),
-                 datetime.strptime(end_time, "%H:%M").time())
-                for start_time, end_time in time_matches
-            ]
+        return area, state, affected_zone, date, time_periods
 
-            return date, time_periods
+    def parse_date_time(self, day, month_year, start_time, end_time):
+        # convert to datetime
+        full_date_str = f"{day} {month_year}"
+        date = datetime.strptime(full_date_str, "%d %B %Y").date()
 
-        return None, []
+        # format time periods
+        time_periods = [(datetime.strptime(start_time, "%H:%M").time(),
+                        datetime.strptime(end_time, "%H:%M").time())]
+        
+        return date, time_periods
 
-    def save_power_outages(self, area, province, zones, date, time_periods):
+    def save_power_outages(self, area, state, affected_zone, date, time_periods):
         for start_time, end_time in time_periods:
             # Check for existing records to avoid duplicates
             if not PowerOutage.objects.filter(
                 area=area,
-                state=province,
-                affected_zone=zones,
+                state=state,
+                affected_zone=affected_zone,
                 date=date,
                 start_time=start_time,
                 end_time=end_time
             ).exists():
                 PowerOutage.objects.create(
                     area=area,
-                    state=province,
-                    affected_zone=zones,
+                    state=state,
+                    affected_zone=affected_zone,
                     date=date,
                     start_time=start_time,
                     end_time=end_time
